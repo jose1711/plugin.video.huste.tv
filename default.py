@@ -127,7 +127,7 @@ def VIDEOLINK(url, name):
     doc = read_page(embed)
     thumb = doc.find('meta', {'property': 'og:image'})['content']
     title = doc.find('title').getText()
-    media_links = re.findall(r'(https://nn[0-9].+mp4)', str(doc.findAll('script')),
+    media_links = re.findall(r'(https://nn.+mp4)', str(doc.findAll('script')),
                              re.M)
     print('media_links: %s' % media_links)
     for media_link in media_links:
