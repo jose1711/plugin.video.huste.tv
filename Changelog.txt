@@ -1,5 +1,7 @@
 2017-12-28
  * Pridana sekcia Aktualne (hlavna stranka webu)
+2017-11-27
+ * Nova ikona
 2017-07-06
  * Opravene prehravanie
 2017-06-02
