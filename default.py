@@ -24,6 +24,7 @@ fanart = xbmc.translatePath(os.path.join(home, 'fanart.jpg'))
 
 def OBSAH():
     # addDir('Hudba','http://hudba.huste.tv',0,1,icon)
+    addDir('Aktuálne', 'https://huste.joj.sk/', 0, 12, icon)
     addDir('Archív', 'https://huste.joj.sk/archiv', 0, 4, icon)
     # addDir('Relácie a seriály','http://zabava.huste.tv',0,4,icon)
     # addDir('Hlášky','http://hlasky.huste.tv',0,4,icon)
@@ -65,6 +66,22 @@ def INDEX(url, page):
             addDir(name, url2, 0, 10, thumb)
     page = page + 1
     addDir('>> Další strana', url, page, 7, nexticon)
+
+
+def INDEX_NEW(url):
+    doc = read_page(url)
+    items = doc.findAll('div', attrs={'class': 'w-articles'})
+    for item in items:
+        for item2 in item.findAll('h3'):
+            if not item2.parent.parent.parent.find(attrs={'class': 'icon icon-play'}):
+                continue
+
+            title = item2.a['title'].encode('utf-8')
+            thumb = item2.parent.parent.img['data-original']
+            name = title
+            url = item2.a['href']
+            print(name, url, 0, 10, thumb)
+            addDir(name, url, 0, 10, thumb)
 
 
 def LIVE(url):
@@ -114,14 +131,6 @@ def LIVE(url):
 
 def VIDEOLINK(url, name):
     doc = read_page(url)
-    # req = urllib2.Request(url)
-    # req.add_header('User-Agent', _UserAgent_)
-    # print('url is %s' % url)
-    # response = urllib2.urlopen(req)
-    # httpdata = response.read()
-    # response.close()
-    # cast_url = urlparse(url)
-    # print(dir(cast_url))
     embed = doc.find('div', {'class': 'e-embed'}).a['data-video-url']
     print('embed is %s' % embed)
     doc = read_page(embed)
@@ -238,5 +247,10 @@ elif mode == 10:
         print("" + url)
         STATS(name, "Item")
         VIDEOLINK(url, name)
+
+elif mode == 12:
+        print("" + url)
+        STATS("INDEX_NEW", "Function")
+        INDEX_NEW(url)
 
 xbmcplugin.endOfDirectory(int(sys.argv[1]))
