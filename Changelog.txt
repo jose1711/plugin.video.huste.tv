@@ -1,3 +1,5 @@
+2020-01-29
+ * Pridane sekcie Live a Pripravujeme.
 2017-12-28
  * Pridana sekcia Aktualne (hlavna stranka webu)
 2017-11-27

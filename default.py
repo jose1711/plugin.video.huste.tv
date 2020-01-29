@@ -29,6 +29,8 @@ def OBSAH():
     # addDir('Relácie a seriály','http://zabava.huste.tv',0,4,icon)
     # addDir('Hlášky','http://hlasky.huste.tv',0,4,icon)
     # addDir('Sport Live & Archiv(BETA)','http://www.huste.tv/services/CurrentLive.xml?nc=6946',0,11,icon)
+    addDir('Live', 'https://huste.joj.sk/live', 0, 11, icon)
+    addDir('Pripravujeme', 'https://huste.joj.sk/live', 0, 13, icon)
 
 
 def KATEGORIE(url):
@@ -128,6 +130,21 @@ def LIVE(url):
             addLink(name, '', nahled, name)
             continue
 
+def LIVE_NEW(url):
+    doc = read_page(url)
+    items = doc.findAll('a', {'class': 'game live'})
+    for item in items:
+        name = item['title'].encode('utf-8')
+        try:
+            doc2 = read_page(item['href'])
+            iframe_url = doc2.findAll('div', {'class': 'b-iframe-video'})[0].iframe['src']
+            doc2 = read_page(iframe_url)
+            media_link = re.findall(r'(https://nn.+\.m3u8)', str(doc2.findAll('script')),
+                             re.M)[0]
+            addLink(name, media_link, '', name)
+        except:
+            continue
+
 
 def VIDEOLINK(url, name):
     doc = read_page(url)
@@ -143,6 +160,22 @@ def VIDEOLINK(url, name):
         name = '%s (%s)' % (title, re.search('-([0-9]+p)\.mp4$',
                                              media_link).group(1))
         addLink(name, media_link, thumb, name)
+
+def UPCOMING(url):
+    doc = read_page(url)
+    for day in doc.findAll('div', {'class': 'b-live-calendar'}):
+        date_text = day.findAll('h3')[0].getText().encode('utf-8')
+        for game in day.findAll('div', {'class': 'b-l-game'}):
+            time_text = game.findAll('div', {'class': 'date'})[0].getText().encode('utf-8')
+            teams_list=[]
+            for team in game.findAll('a', {'class': 'i'}):
+                teams_list.append(team['title'].encode('utf-8'))
+            teams_text=" ".join(teams_list)
+            breadcrumbs_list=[]
+            for breadcrumb in game.findAll('li'):
+                breadcrumbs_list.append(breadcrumb.getText().encode('utf-8'))
+            breadcrumbs_text="\n".join(breadcrumbs_list)
+            addLink("%s %s %s"%(teams_text, date_text, time_text), '', '', breadcrumbs_text)
 
 
 def get_params():
@@ -241,7 +274,7 @@ elif mode == 7:
 elif mode == 11:
         print("" + url)
         STATS("LIVE", "Function")
-        LIVE(url)
+        LIVE_NEW(url)
 
 elif mode == 10:
         print("" + url)
@@ -252,5 +285,9 @@ elif mode == 12:
         print("" + url)
         STATS("INDEX_NEW", "Function")
         INDEX_NEW(url)
+
+elif mode == 13:
+        print("" + url)
+        UPCOMING(url)
 
 xbmcplugin.endOfDirectory(int(sys.argv[1]))
